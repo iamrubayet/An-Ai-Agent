@@ -165,14 +165,14 @@ class QueryPlanner:
     
     def _plan_weather(self, normalized_query: str, original_query: str) -> Optional[ToolPlan]:
         """Plan for weather queries."""
-        if self.patterns['weather'].search(normalized_query):
+        if self.patterns['weather'].search(normalized_query) or "summarize" in normalized_query:
             # Extract city name
             city_match = self.patterns['city_extraction'].search(normalized_query)
             city = city_match.group(1).strip().title() if city_match else "Paris"
             
             return ToolPlan(
                 tool=ToolName.WEATHER,
-                args={"city": city}
+                args={"city": city, "query": original_query}
             )
         
         return None

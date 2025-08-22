@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  agent:
+    build: .
+    container_name: tool-using-agent
+    volumes:
+      # Mount data directory to persist knowledge base changes
+      - ./data:/app/data
+      # Mount logs directory (optional)
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    # Interactive mode for CLI usage
+    stdin_open: true
+    tty: true
+    # Default command can be overridden
+    command: ["--help"]
+
+  # Development service with hot reload
+  agent-dev:
+    build: .
+    container_name: tool-using-agent-dev
+    volumes:
+      # Mount entire codebase for development
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+    stdin_open: true
+    tty: true
+    # Override to run in development mode
+    command: ["--help"]
+
+  # Testing service
+  agent-test:
+    build: .
+    container_name: tool-using-agent-test
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+    command: ["python", "-m", "pytest", "-v"]
+
+  # Interactive shell service
+  agent-shell:
+    build: .
+    container_name: tool-using-agent-shell
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+    stdin_open: true
+    tty: true
+    entrypoint: ["/bin/bash"]
